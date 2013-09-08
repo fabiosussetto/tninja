@@ -15,9 +15,24 @@ $.fn.serializeObject = function() {
 };
 
 
+server_logger = {
+    console: $('#server-log ul'),
+    log: function(msg) {
+        this.console.append('<li>' + msg + '</li>');
+    }
+}
+
 $('[data-action=start-server]').click(function(e) {
     e.preventDefault();
-    app_server.start();
+    var settings = $('#vars-form').serializeObject();
+    settings.base_path = $('#curr-folder').text();
+    app_server.start(JSON.stringify(settings));
+});
+
+$('[data-action=set-project-root]').click(function(e) {
+    e.preventDefault();
+    file_browser.select_dir();
+    $('#curr-folder').text(file_browser.dirname);
 });
 
 $('[data-action=stop-server]').click(function(e) {
@@ -27,5 +42,4 @@ $('[data-action=stop-server]').click(function(e) {
 
 $('#vars-form').submit(function(e) {
     e.preventDefault();
-    settings.save(JSON.stringify($(this).serializeObject()));
 });

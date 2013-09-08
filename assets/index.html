@@ -6,59 +6,51 @@
     <!-- Bootstrap -->
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
-
+    <link rel="stylesheet" href="css/app.css">
 
   </head>
   <body>
 
-    <nav class="navbar navbar-default" role="navigation">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="#">Brand</a>
-      </div>
+    <div id="app">
 
-  <!-- Collect the nav links, forms, and other content for toggling -->
-  <div class="collapse navbar-collapse navbar-ex1-collapse">
-    <ul class="nav navbar-nav">
-      <li class="active"><a href="#">Link</a></li>
-      <li><a href="#">Link</a></li>
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Action</a></li>
-          <li><a href="#">Another action</a></li>
-          <li><a href="#">Something else here</a></li>
-          <li><a href="#">Separated link</a></li>
-          <li><a href="#">One more separated link</a></li>
-        </ul>
-      </li>
-    </ul>
-  </div><!-- /.navbar-collapse -->
-</nav>
+        <div class="frame">
+            <nav role="side">
+                <ul>
+                    <li class="active"><a href="#"><span class="glyphicon glyphicon-dashboard"></span></a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-hdd"></span></a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-cog"></span></a></li>
+                </ul>
+            </nav>
+            <div role="main">
+                <header>
+                    <h1>Templater</h1>
+                </header>
+                <div class="content">
+                    <p>
+                        <button class="button p" data-action="start-server">Start server</button>
+                        <button class="button s" data-action="stop-server">Stop server</button>
+                    </p>
 
-    <div class="container">
+                    <p>
+                        <button data-action="set-project-root">Select folder</button>
+                        <span id="curr-folder"></span>
+                    </p>
 
-        <h1>Hello, world!</h1>
+                    <form role="form" id="vars-form">
+                      <div class="form-group">
+                        <label>Listen on port</label>
+                        <input type="text" class="form-control" name="port">
+                      </div>
+                    </form>
 
-        <p>
-            <button class="btn btn-primary btn-lg" data-action="start-server">Start server</button>
-            <button class="btn btn-lg" data-action="stop-server">Stop server</button>
-        </p>
+                    <div id="server-log" class="console">
+                        <ul></ul>
+                    </div>
 
-        <form role="form" id="vars-form">
-          <div class="form-group">
-            <label>Custom var</label>
-            <input type="text" class="form-control" name="custom-var">
-          </div>
-          <button type="submit" class="btn btn-default">Save</button>
-        </form>
+                </div>
 
+            </div>
+        </div>
     </div>
 
 

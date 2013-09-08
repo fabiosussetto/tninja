@@ -12,20 +12,76 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 server_proc = None
 
-class ServerController(QObject):
+
+class FileBrowser(QObject):
+
+    def __init__(self, *args, **kwargs):
+        self.main_window = kwargs.pop('main_window')
+        super(FileBrowser, self).__init__(*args, **kwargs)
 
     @Slot()
-    def start(self):
+    def select_dir(self):
+        self._dirname = QFileDialog.getExistingDirectory(self.main_window,
+            "Select project root", "~")
+
+    def get_dirname(self):
+        return self._dirname
+
+    def set_dirname(self, value):
+        self._dirname = value
+
+    dirname = Property(str, get_dirname, set_dirname)
+
+
+class ServerLogger(object):
+
+    frame = None
+
+    def __init__(self, frame):
+        self.frame = frame
+
+    def log(self, msg):
+        script = 'server_logger.log("%s");' % msg
+        self.frame.evaluateJavaScript(script)
+
+
+class ServerController(QObject):
+
+    def __init__(self, *args, **kwargs):
+        self.app = kwargs.pop('main_window')
+        super(ServerController, self).__init__(*args, **kwargs)
+
+
+    @Slot(str)
+    def start(self, options=None):
         global server_proc
-        base_project = os.path.join(BASE_DIR, 'project')
-        cmd = ['python', os.path.join(BASE_DIR, 'server.py'), '--base_path', './project']
+
+        if isinstance(options, basestring):
+            options = json.loads(options)
+
+        options = options or {}
+
+        default_options = {
+            'port': 8005
+        }
+
+        options = dict(default_options, **options)
+
+        cmd = ['python', os.path.join(BASE_DIR, 'server.py')]
+
+        for key, val in options.items():
+            cmd.extend(['--%s' % key, val])
+
+        self.app.server_logger.log("Starting server...")
         server_proc = subprocess.Popen(cmd, cwd=BASE_DIR)
+        self.app.server_logger.log("Server started on port %s." % options['port'])
 
     @Slot()
     def stop(self):
-        print "Stopping server"
+        self.app.server_logger.log("Stopping server...")
         if server_proc:
             server_proc.terminate()
+            self.app.server_logger.log("Server stopped.")
         #print server_proc.wait()
 
 
@@ -41,20 +97,25 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         # Initialize the object as a QLabel
         super(MainWindow, self).__init__(parent)
-        self.resize(731, 475)
+        self.resize(650, 375)
 
-        self.setMinimumSize(400, 185)
-        self.setWindowTitle('Dynamic Greeter')
+        # self.setMinimumSize(550, 475)
+        self.setWindowTitle('Templater')
 
         web_view = QWebView(parent)
 
         web_view.page().settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
 
-        self.server = ServerController()
+        self.server_logger = ServerLogger(web_view.page().mainFrame())
+
+        self.server = ServerController(main_window=self)
+        self.file_browser = FileBrowser(main_window=self)
+
         self.settings = SettingsController()
 
         web_view.load(QUrl("assets/index.html"))
         web_view.page().mainFrame().addToJavaScriptWindowObject('app_server', self.server)
+        web_view.page().mainFrame().addToJavaScriptWindowObject('file_browser', self.file_browser)
         web_view.page().mainFrame().addToJavaScriptWindowObject('settings', self.settings)
 
         web_view.show()

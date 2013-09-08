@@ -47,13 +47,16 @@ def run_from_cli():
     parser.add_argument('--base_path', dest='base_path', default=None,
                         help="Base directory to serve files from.")
 
+    parser.add_argument('--port', dest='port', default=8080,
+                        help="Port to listen on.")
+
 
     args = vars(parser.parse_args())
 
     if args['base_path']:
         os.chdir(args['base_path'])
 
-    httpd = Server(('', 8005), RequestHandler)
+    httpd = Server(('', int(args['port'])), RequestHandler)
 
     try:
         print 'Mobile Server started at port 8005 ...'
