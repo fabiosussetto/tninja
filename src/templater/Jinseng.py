@@ -1,17 +1,21 @@
 import os
 import sys
 import json
+import subprocess
 
 from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtWebKit import *
 
-import subprocess
+# Needed by py2app, otherwise it forgets to include it
+# and the app crashes at launch
+from PySide.QtNetwork import *
+
+import server
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 server_proc = None
-
 
 class FileBrowser(QObject):
 
@@ -100,7 +104,7 @@ class MainWindow(QMainWindow):
         self.resize(650, 375)
 
         # self.setMinimumSize(550, 475)
-        self.setWindowTitle('Templater')
+        self.setWindowTitle('Jingseng')
 
         web_view = QWebView(parent)
 
@@ -113,7 +117,8 @@ class MainWindow(QMainWindow):
 
         self.settings = SettingsController()
 
-        web_view.load(QUrl("assets/index.html"))
+        web_view.load(QUrl("%s/assets/index.html" % BASE_DIR))
+
         web_view.page().mainFrame().addToJavaScriptWindowObject('app_server', self.server)
         web_view.page().mainFrame().addToJavaScriptWindowObject('file_browser', self.file_browser)
         web_view.page().mainFrame().addToJavaScriptWindowObject('settings', self.settings)
